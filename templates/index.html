@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detector de Glaucoma</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .container {
+            text-align: center;
+            margin: auto;
+        }
+        .image-container {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+            margin-top: 20px;
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .image-box {
+            width: 300px;
+            height: 300px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #ccc;
+            margin: 5px;
+            border-radius: 10px;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .image-box img {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            margin: auto;
+        }
+        .imageDisplay{
+            width:100%;
+        }
+        .label {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        input[type="file"], input[type="number"], input[type="range"] {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Detector de Glaucoma con Imágenes del fondo del ojo</h1>
+        <p>Sube una imagen para hacer una predicción</p>
+        <input type="file" id="fileInput" accept="image/*">
+        <br>
+        <label for="cropSize">Porcentaje de zoom del disco óptico:</label>
+        <input type="number" id="cropSize" value="20" min="0" max="100">
+        <input type="range" id="cropSlider" value="20" min="0" max="100">
+        <br>
+        <button id="predictButton">Predecir</button>
+        <div id="result"></div>
+
+        <div class="image-container">
+            <div class="image-box">
+                <div class="label">Imagen Original</div>
+                <div id="imageOriginal" class="imageDisplay"></div>
+            </div>
+            <div class="image-box">
+                <div class="label">Posición predicha del disco óptico (ONH)</div>
+                <div id="imageResult" class="imageDisplay"></div>
+            </div>
+            <div class="image-box">
+                <div class="label">Imagen Nervio Óptico</div>
+                <div id="imageCropped" class="imageDisplay"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cropSizeInput = document.getElementById('cropSize');
+        const cropSlider = document.getElementById('cropSlider');
+
+        // Synchronize the number input and slider
+        cropSizeInput.addEventListener('input', () => {
+            cropSlider.value = cropSizeInput.value;
+        });
+
+        cropSlider.addEventListener('input', () => {
+            cropSizeInput.value = cropSlider.value;
+        });
+
+        document.getElementById('fileInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const imageElement = document.createElement('img');
+                    imageElement.src = event.target.result;
+                    document.getElementById('imageOriginal').innerHTML = '';
+                    document.getElementById('imageOriginal').appendChild(imageElement);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('predictButton').addEventListener('click', () => {
+            const fileInput = document.getElementById('fileInput');
+            const resultDiv = document.getElementById('result');
+            const imageResultDiv = document.getElementById('imageResult');
+            const imageCroppedDiv = document.getElementById('imageCropped');
+
+            if (!fileInput.files.length) {
+                resultDiv.textContent = 'Por favor, selecciona una imagen.';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const cropSize = cropSizeInput.value;
+
+            resultDiv.textContent = 'Prediciendo...';
+
+            imageResultDiv.innerHTML = '';
+            imageCroppedDiv.innerHTML = '';
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('crop_size_percent', cropSize);
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        resultDiv.textContent = data.error;
+                    } else {
+                        resultDiv.textContent = 'Predicción completada.';
+                        imageResultDiv.innerHTML = `<img src="data:image/png;base64,${data.prediction_image}" alt="Resultado">`;
+                        imageCroppedDiv.innerHTML = `<img src="data:image/png;base64,${data.cropped_image}" alt="Imagen Recortada">`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    resultDiv.textContent = 'Hubo un error al realizar la predicción.';
+                });
+        });
+    </script>
+</body>
+</html>
