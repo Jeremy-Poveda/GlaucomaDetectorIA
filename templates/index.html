@@ -102,7 +102,7 @@
         <p>Sube una imagen para hacer una predicción</p>
         <input type="file" id="fileInput" accept="image/*">
         <br>
-        <label for="cropSize">Porcentaje de zoom del disco óptico:</label>
+        <label for="cropSize">Porcentaje de padding de la zona delimitadora:</label>
         <input type="number" id="cropSize" value="20" min="0" max="100">
         <input type="range" id="cropSlider" value="20" min="0" max="100">
         <br>
@@ -128,16 +128,12 @@
     <script>
         const cropSizeInput = document.getElementById('cropSize');
         const cropSlider = document.getElementById('cropSlider');
-
-        // Synchronize the number input and slider
         cropSizeInput.addEventListener('input', () => {
             cropSlider.value = cropSizeInput.value;
         });
-
         cropSlider.addEventListener('input', () => {
             cropSizeInput.value = cropSlider.value;
         });
-
         document.getElementById('fileInput').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {
@@ -151,7 +147,6 @@
                 reader.readAsDataURL(file);
             }
         });
-
         document.getElementById('predictButton').addEventListener('click', () => {
             const fileInput = document.getElementById('fileInput');
             const resultDiv = document.getElementById('result');
@@ -162,12 +157,9 @@
                 resultDiv.textContent = 'Por favor, selecciona una imagen.';
                 return;
             }
-
             const file = fileInput.files[0];
             const cropSize = cropSizeInput.value;
-
             resultDiv.textContent = 'Prediciendo...';
-
             imageResultDiv.innerHTML = '';
             imageCroppedDiv.innerHTML = '';
 
