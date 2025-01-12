@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detector de Glaucoma con Imágenes del Fondo del Ojo</title>
+    <title>Detector de Glaucoma</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>Detector de Glaucoma con Imágenes del Fondo del Ojo</h1>
+        <h1>Detector de glaucoma con imágenes del fondo del ojo</h1>
         <p>Sube una imagen para hacer una predicción sobre el glaucoma.</p>
 
-        <input type="file" id="fileInput" accept="image/*">
+        <label for="fileInput" class="custom-file-upload">
+            Seleccionar imagen
+        </label>
+        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+        
         <button id="predictButton">Predecir</button>
         <div id="result"></div>
 
@@ -23,8 +27,14 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <div id="customModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn">&times;</button>
+            <p id="modalMessage"></p>
+        </div>
+    </div>
 
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
 
