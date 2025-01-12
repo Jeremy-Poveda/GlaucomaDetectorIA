@@ -4,107 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detector de Glaucoma con Imágenes del Fondo del Ojo</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            flex-direction: column;
-            text-align: center;
-        }
-        .container {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 80%;
-            max-width: 800px;
-        }
-        h1 {
-            color: #007bff;
-        }
-        .image-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .image-box {
-            width: 300px;
-            height: 300px;
-            position: relative;
-            overflow: hidden;
-            border: 2px solid #ccc;
-            margin: 10px;
-            border-radius: 10px;
-            background-color: #f9f9f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .image-box img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-        .label {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            font-weight: bold;
-            padding: 5px;
-        }
-        input[type="file"], button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        input[type="file"] {
-            margin-top: 20px;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        #result {
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .error {
-            color: red;
-        }
-        .loading {
-            color: #ff8c00;
-            font-style: italic;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <div class="container">
         <h1>Detector de Glaucoma con Imágenes del Fondo del Ojo</h1>
         <p>Sube una imagen para hacer una predicción sobre el glaucoma.</p>
 
-        <!-- Formulario de carga de archivo -->
         <input type="file" id="fileInput" accept="image/*">
         <button id="predictButton">Predecir</button>
         <div id="result"></div>
 
-        <!-- Contenedor de imágenes -->
         <div class="image-container">
             <div class="image-box">
                 <div class="label">Imagen Original</div>
@@ -113,64 +23,8 @@
         </div>
     </div>
 
-    <script>
-        document.getElementById('fileInput').addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const imageElement = document.createElement('img');
-                    imageElement.src = event.target.result;
-                    document.getElementById('imageOriginal').innerHTML = '';
-                    document.getElementById('imageOriginal').appendChild(imageElement);
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 
-        document.getElementById('predictButton').addEventListener('click', () => {
-            const fileInput = document.getElementById('fileInput');
-            const resultDiv = document.getElementById('result');
-
-            if (!fileInput.files.length) {
-                resultDiv.textContent = 'Por favor, selecciona una imagen.';
-                resultDiv.classList.add('error');
-                return;
-            }
-
-            const file = fileInput.files[0];
-            const formData = new FormData();
-            formData.append('file', file);
-
-            resultDiv.textContent = 'Cargando predicción...';
-            resultDiv.classList.add('loading');
-
-            fetch('/diagnosticate', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                resultDiv.classList.remove('loading');
-                if (data.error) {
-                    resultDiv.textContent = 'Error: ' + data.error;
-                    resultDiv.classList.add('error');
-                    alert('La imagen no es válida como fondo de ojo.');
-                } else {
-                    resultDiv.textContent = data.result, // === 'glaucoma' ? 'El ojo tiene glaucoma.' : 'El ojo no tiene glaucoma.';
-                    resultDiv.classList.remove('error');
-                    resultDiv.classList.add(data.result === 'glaucoma' ? 'success' : 'no-glaucoma');
-                    alert('Predicción completada');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                resultDiv.textContent = 'Hubo un error al realizar la predicción.';
-                resultDiv.classList.add('error');
-            });
-        });
-        
-    </script>
 </body>
 </html>
 

@@ -6,4 +6,4 @@ class ImageValidator:
 
     def isValidImage(self, image_resized):
         prediction = self.model.predict(image_resized)
-        return prediction[0] < 0.5  # True si es una imagen válida
+        return prediction[0] < 0.5  

@@ -8,9 +8,6 @@ class Preprocessor:
         if image.mode != 'RGB':
             image = image.convert('RGB')
 
-        enhancer = ImageEnhance.Brightness(image)
-        image = enhancer.enhance(0.7)
-
         image_resized = image.resize((224, 224))
         image_resized = np.array(image_resized) / 255.0
         if image_resized.ndim == 2:
