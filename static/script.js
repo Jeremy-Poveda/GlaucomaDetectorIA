@@ -5,8 +5,14 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
         reader.onload = function (event) {
             const imageElement = document.createElement('img');
             imageElement.src = event.target.result;
-            document.getElementById('imageOriginal').innerHTML = '';
-            document.getElementById('imageOriginal').appendChild(imageElement);
+
+            imageElement.style.maxWidth = '100%';
+            imageElement.style.maxHeight = '100%';
+            imageElement.style.objectFit = 'contain';
+
+            const imageContainer = document.getElementById('imageOriginal');
+            imageContainer.innerHTML = ''; 
+            imageContainer.appendChild(imageElement); 
         };
         reader.readAsDataURL(file);
     }

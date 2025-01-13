@@ -64,6 +64,15 @@ p {
     border-radius: 10px;
 }
 
+#imageOriginal {
+    max-width: 300px; 
+    max-height: 300px;
+    overflow: hidden; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .label {
     position: absolute;
     top: 10px;
